@@ -64,7 +64,7 @@ session_start();
         <div class="notification-container">
             <?php
             if (isset($_POST["submit"])) {
-               $fullName = $_POST["fullname"];
+               $username = $_POST["username"];
                $email = $_POST["email"];
                $password = $_POST["password"];
                $passwordRepeat = $_POST["repeat_password"];
@@ -72,27 +72,32 @@ session_start();
                $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
                 //checks if yes
-               if (empty($fullName) || empty($email) || empty($password) || empty($passwordRepeat)) {
+               if (empty($username) || empty($email) || empty($password)) {
                    echo "<div class='notif'>All fields are required</div>";
                } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                    echo "<div class='notif'>Email is not valid</div>";
                } elseif (strlen($password) < 6) {
                    echo "<div class='notif'>Password must be at least 5 characters!</div>";
-               } elseif ($password !== $passwordRepeat) {
-                   echo "<div class='notif'>Password do not match</div>";
                } else {
+                    //checks database if duplicate email or username
                    require_once "database.php";
                    $sql = "SELECT * FROM users WHERE email = '$email'";
                    $result = mysqli_query($conn, $sql);
                    $checkemail = mysqli_num_rows($result);
+
+                   $sql_username = "SELECT * FROM users WHERE username = '$username'";
+                   $result_username = mysqli_query($conn, $sql_username);
+                   $check_username = mysqli_num_rows($result_username);
                    if ($checkemail > 0) {
                        echo "<div class='notif'>Email already exists!</div>";
+                   } elseif ($check_username > 0){
+                        echo "<div class='notif'>Username already exists!</div>";
                    } else {
-                       $sql = "INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)";
+                       $sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
                        $stmt = mysqli_stmt_init($conn); 
                        $prepareStmt = mysqli_stmt_prepare($stmt, $sql);
                        if ($prepareStmt) {
-                           mysqli_stmt_bind_param($stmt, "sss", $fullName, $email, $passwordHash);
+                           mysqli_stmt_bind_param($stmt, "sss", $username, $email, $passwordHash);
                            mysqli_stmt_execute($stmt);
                            echo "<div class='notif-s'>Registered successfully.</div>";
                        } else {
@@ -105,7 +110,7 @@ session_start();
         </div>
         <form action="signup.php" method="post">
             <div class="form-container">
-                <input type="text" class="input-form" name="fullname" placeholder="Full Name:">
+                <input type="text" class="input-form" name="username" placeholder="Username:">
             </div>
             <div class="form-container">
                 <input type="email" class="input-form" name="email" placeholder="Email:">

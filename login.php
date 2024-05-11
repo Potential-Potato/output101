@@ -54,10 +54,10 @@ if (isset($_SESSION["user"])) {
     <div class="container">
         <?php
         if (isset($_POST["login"])) {
-           $email = $_POST["email"];
+           $username = $_POST["username"];
            $password = $_POST["password"];
             require_once "database.php";
-            $sql = "SELECT * FROM users WHERE email = '$email'";
+            $sql = "SELECT * FROM users WHERE username = '$username'";
             $result = mysqli_query($conn, $sql);
             $user = mysqli_fetch_array($result, MYSQLI_ASSOC);
             if ($user) {
@@ -70,17 +70,17 @@ if (isset($_SESSION["user"])) {
                     echo "<div class='notif'>Incorrect Password</div>";
                 }
             }else{
-                echo "<div class='notif'>Email does not exist</div>";
+                echo "<div class='notif'>User does not exist</div>";
             }
         }
         ?>
        <h3>Login</h3>
       <form action="login.php" method="post">
         <div class="form-container">
-            <input type="email" placeholder="Enter Email:" name="email" class="input-form">
+            <input type="text" placeholder="Username:" name="username" class="input-form">
         </div>
         <div class="form-container">
-            <input type="password" placeholder="Enter Password:" name="password" class="input-form">
+            <input type="password" placeholder="Password:" name="password" class="input-form">
         </div>
         <div class="form-btn">
             <input type="submit" value="Login" name="login" class="btn">
